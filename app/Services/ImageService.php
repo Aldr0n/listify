@@ -2,15 +2,17 @@
 
 namespace App\Services;
 
-class ImageService
-{
-    public function storeImage(int $userId, array $image)
-    {
-        // TODO: Implement storeImage() method.
-    }
+use App\Contracts\Provider\ImageProvider;
 
-    public function getImage(int $userId, string $imageId)
+class ImageService implements ImageProvider
+{
+    public function getImage(string $imageId)
     {
         // TODO: Implement getImage() method.
+    }
+
+    public function storeImage(array $image, string $userId = NULL)
+    {
+        // TODO: Implement storeImage() method.
     }
 }
