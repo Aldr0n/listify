@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use Illuminate\Foundation\Auth\User;
+use App\Contracts\Services\OauthTokenService;
 
-class UserService
+class SpotifyUserService
 {
     public function __construct(
-        protected SpotifyService $spotifyService,
+        protected OauthTokenService $spotifyApiService,
     ) {}
 
     public function storeUserProfile(int $userId)
