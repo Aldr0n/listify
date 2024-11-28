@@ -8,7 +8,7 @@ use App\Models\SpotifyToken;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
-class SpotifyService implements OauthTokenManager, PlaylistProvider
+class SpotifyService implements OauthTokenManager
 {
     protected string $baseUrl = 'https://api.spotify.com/v1';
 
@@ -42,11 +42,10 @@ class SpotifyService implements OauthTokenManager, PlaylistProvider
 
     public function refreshToken(int $userId): void
     {
-        // Implementation for refreshing the token
-        // Will add this in the next step
+        // TODO: Implementation for refreshing the token
     }
 
-    public function getPlaylists(int $userId): array
+    public function fetchUserPlaylists(int $userId): array
     {
         $token = SpotifyToken::where('user_id', $userId)->first();
 
@@ -60,17 +59,8 @@ class SpotifyService implements OauthTokenManager, PlaylistProvider
         return $response->json();
     }
 
-    public function getPlaylist(int $userId, string $playlistId): array
+    public function fetchUserProfile(int $userId)
     {
-        $token = SpotifyToken::where('user_id', $userId)->first();
-
-        if ($this->needsTokenRefresh($userId)) {
-            $this->refreshToken($userId);
-        }
-
-        $response = Http::withToken($token->access_token)
-            ->get("{$this->baseUrl}/playlists/{$playlistId}");
-
-        return $response->json();
+        // TODO: Implement fetchUserProfile() method.
     }
 }
