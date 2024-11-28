@@ -15,6 +15,7 @@
         "socialiteproviders/spotify": "^4.1"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.2",
         "fakerphp/faker": "^1.23",
         "laravel/breeze": "^2.2",
         "laravel/pail": "^1.1",
