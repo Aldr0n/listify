@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('spotify_tokens', function (Blueprint $table) {
+        Schema::create('spotify_tokens', function (Blueprint $table)
+        {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('access_token');
+            $table->string('refresh_token');
+            $table->timestamp('expires_at');
             $table->timestamps();
         });
     }
