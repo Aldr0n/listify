@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Spotify;
 
 use App\Contracts\Services\OauthTokenService;
 use App\Models\SpotifyToken;
