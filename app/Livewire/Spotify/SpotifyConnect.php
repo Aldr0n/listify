@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Spotify;
 
+use App\Contracts\Services\SpotifyServiceContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +10,13 @@ use Livewire\Component;
 
 class SpotifyConnect extends Component
 {
+    private SpotifyServiceContract $spotifyService;
+
+    public function __construct()
+    {
+        $this->spotifyService = app(SpotifyServiceContract::class);
+    }
+
     public function render(): Factory|View
     {
         return view('livewire.pages.auth.spotify-connect', [
@@ -18,7 +26,7 @@ class SpotifyConnect extends Component
 
     public function disconnect(): void
     {
-        Auth::user()->spotifyToken?->delete();
+        $this->spotifyService->removeCredentials(Auth::id());
         $this->dispatch('spotify-disconnected');
     }
 }

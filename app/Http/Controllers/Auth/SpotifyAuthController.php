@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Contracts\Services\SpotifyServiceContract;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class SpotifyAuthController extends Controller
 {
+    public function __construct(
+        private SpotifyServiceContract $spotifyService
+    ) {}
+
     public function redirect()
     {
         return Socialite::driver('spotify')
@@ -21,16 +25,11 @@ class SpotifyAuthController extends Controller
     {
         $spotifyUser = Socialite::driver('spotify')->user();
 
-        dd($spotifyUser);
-
-        Auth::user()->spotifyToken()->updateOrCreate(
-            ['user_id' => Auth::user()->id],
-            [
-                'access_token'  => $spotifyUser->token,
-                'refresh_token' => $spotifyUser->refreshToken,
-                'expires_at'    => Carbon::now()->addSeconds($spotifyUser->expiresIn),
-            ]
-        );
+        $this->spotifyService->storeCredentials(Auth::id(), [
+            'access_token'  => $spotifyUser->token,
+            'refresh_token' => $spotifyUser->refreshToken,
+            'expires_in'    => $spotifyUser->expiresIn,
+        ]);
 
         return redirect()->route('dashboard')->with('status', 'Spotify connected successfully!');
     }
