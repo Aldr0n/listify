@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Spotify;
 
-use App\Contracts\Services\OauthTokenManager;
+use App\Contracts\Services\OauthTokenService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -10,11 +10,11 @@ use Livewire\Component;
 
 class SpotifyConnect extends Component
 {
-    private OauthTokenManager $spotifyService;
+    private OauthTokenService $spotifyService;
 
     public function __construct()
     {
-        $this->spotifyService = app(OauthTokenManager::class);
+        $this->spotifyService = app(OauthTokenService::class);
     }
 
     public function render(): Factory|View

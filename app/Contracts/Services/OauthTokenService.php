@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Services;
 
-interface OauthTokenManager
+interface OauthTokenService
 {
     /**
      * Store Spotify credentials for a user
