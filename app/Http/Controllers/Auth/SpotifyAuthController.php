@@ -11,7 +11,7 @@ use Laravel\Socialite\Facades\Socialite;
 class SpotifyAuthController extends Controller
 {
     public function __construct(
-        private OauthTokenService $spotifyService
+        private OauthTokenService $SpotifyApiService
     ) {}
 
     public function redirect()
@@ -25,7 +25,9 @@ class SpotifyAuthController extends Controller
     {
         $spotifyUser = Socialite::driver('spotify')->user();
 
-        $this->spotifyService->storeCredentials(Auth::id(), [
+        dd($spotifyUser);
+
+        $this->SpotifyApiService->storeCredentials(Auth::id(), [
             'access_token'  => $spotifyUser->token,
             'refresh_token' => $spotifyUser->refreshToken,
             'expires_in'    => $spotifyUser->expiresIn,

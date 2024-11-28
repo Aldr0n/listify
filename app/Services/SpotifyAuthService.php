@@ -3,12 +3,11 @@
 namespace App\Services;
 
 use App\Contracts\Services\OauthTokenService;
-use App\Contracts\Services\PlaylistProvider;
 use App\Models\SpotifyToken;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
-class SpotifyService implements OauthTokenService
+class SpotifyAuthService implements OauthTokenService
 {
     protected string $baseUrl = 'https://api.spotify.com/v1';
 
