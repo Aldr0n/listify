@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\Services\OauthTokenService;
+use App\Services\Spotify\SpotifyClientService;
 use App\Services\SpotifyAuthService;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Setup Spotify services
+        $this->app->bind(OauthTokenService::class, SpotifyClientService::class);
         // Setup Spotify service
         $this->app->bind(OauthTokenService::class, SpotifyAuthService::class);
     }

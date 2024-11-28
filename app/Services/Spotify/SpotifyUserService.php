@@ -3,17 +3,17 @@
 namespace App\Services;
 
 use App\Contracts\Services\AppUserService;
-use App\Contracts\Services\OauthTokenService;
+use App\Services\Spotify\SpotifyClientService;
 
 class SpotifyUserService implements AppUserService
 {
     public function __construct(
-        protected OauthTokenService $spotifyApiService,
+        protected SpotifyClientService $spotifyClientService,
     ) {}
 
     public function storeUserProfile(int $userId)
     {
-        // TODO: Implement storeUserProfile() method.
+        $this->spotifyClientService->fetchUserProfile($userId);
     }
 
     public function deleteUserProfile(int $userId)
