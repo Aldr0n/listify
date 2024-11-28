@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Contracts\Services\SpotifyServiceContract;
+use App\Contracts\Services\OauthTokenManager;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +11,7 @@ use Laravel\Socialite\Facades\Socialite;
 class SpotifyAuthController extends Controller
 {
     public function __construct(
-        private SpotifyServiceContract $spotifyService
+        private OauthTokenManager $spotifyService
     ) {}
 
     public function redirect()

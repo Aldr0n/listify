@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Services;
 
-interface SpotifyServiceContract
+interface OauthTokenManager
 {
     /**
      * Store Spotify credentials for a user
@@ -23,14 +23,4 @@ interface SpotifyServiceContract
      * Refresh the access token
      */
     public function refreshToken(int $userId): void;
-
-    /**
-     * Get user's playlists
-     */
-    public function getPlaylists(int $userId): array;
-
-    /**
-     * Get a specific playlist
-     */
-    public function getPlaylist(int $userId, string $playlistId): array;
 }
