@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('playlists', function (Blueprint $table) {
+        Schema::create('playlists', function (Blueprint $table)
+        {
             $table->id();
             $table->timestamps();
+            $table->string('title');
+            $table->string('description')->nullable();
+            $table->string('spotify_id');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('track_id')->constrained('tracks');
+            $table->string('thumbnail_url');
         });
     }
 
