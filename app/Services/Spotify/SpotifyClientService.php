@@ -43,9 +43,24 @@ class SpotifyClientService implements ApiClientService
         return $data;
     }
 
-    public function fetchPlaylistTracks(string $playlistId): array
+    public function fetchPlaylistTracks(string $playlistId, SpotifyToken $token, array $params = []): array
     {
-        return [];
+        $response = Http::withToken($token->access_token)
+            ->get("{$this->baseUrl}/playlists/{$playlistId}/tracks", $params);
+
+        if (!$response->successful()) {
+            throw new \RuntimeException(
+                "Failed to fetch playlist tracks: {$response->status()} - {$response->body()}"
+            );
+        }
+
+        $data = $response->json();
+
+        if (!is_array($data) || !isset($data['items'])) {
+            throw new \RuntimeException('Spotify API returned invalid data format');
+        }
+
+        return $data;
     }
 
     public function refreshToken(int $userId): array
