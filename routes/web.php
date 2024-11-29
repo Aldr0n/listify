@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function ()
 {
     Route::get('/auth/spotify', [SpotifyAuthController::class, 'redirect'])
         ->name('spotify.auth');
+
     Route::get('/auth/spotify/callback', [SpotifyAuthController::class, 'callback'])
         ->name('spotify.callback');
 });
