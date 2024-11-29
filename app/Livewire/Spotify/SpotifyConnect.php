@@ -10,11 +10,11 @@ use Livewire\Component;
 
 class SpotifyConnect extends Component
 {
-    private OauthTokenService $spotifyService;
+    private OauthTokenService $spotifyAuthService;
 
-    public function __construct()
+    public function mount(OauthTokenService $spotifyAuthService)
     {
-        $this->spotifyService = app(OauthTokenService::class);
+        $this->spotifyAuthService = $spotifyAuthService;
     }
 
     public function render(): Factory|View
@@ -26,7 +26,7 @@ class SpotifyConnect extends Component
 
     public function disconnect(): void
     {
-        $this->spotifyService->removeCredentials(Auth::id());
+        $this->spotifyAuthService->removeCredentials(Auth::id());
         $this->dispatch('spotify-disconnected');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Services\Spotify;
 
-use App\Services\SpotifyUserService;
+use App\Services\Spotify\SpotifyUserService;
 use Illuminate\Support\Facades\Http;
 
 class SpotifyClientService

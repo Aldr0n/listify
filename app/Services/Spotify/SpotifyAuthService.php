@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Http;
 
 class SpotifyAuthService implements OauthTokenService
 {
-    public function __construct(
-        protected SpotifyClientService $spotifyClientService,
-    ) {}
 
     public function needsTokenRefresh(int $userId): bool
     {
@@ -35,6 +32,21 @@ class SpotifyAuthService implements OauthTokenService
     {
         SpotifyToken::where('user_id', $userId)->delete();
         Auth::user()->update(['is_spotify_connected' => FALSE]);
+    }
+
+    public function getValidToken(int $userId): SpotifyToken
+    {
+        $token = SpotifyToken::where('user_id', $userId)->first();
+
+        if (!$token) {
+            throw new Exception('No token found for user');
+        }
+
+        if ($this->needsTokenRefresh($userId)) {
+            $this->refreshToken($userId);
+        }
+
+        return $token;
     }
 
     public function refreshToken(int $userId): void
@@ -68,21 +80,6 @@ class SpotifyAuthService implements OauthTokenService
             'refresh_token' => $credentials['refresh_token'] ?? $token->refresh_token,
             'expires_in'    => $credentials['expires_in'],
         ]);
-    }
-
-    public function getValidToken(int $userId): SpotifyToken
-    {
-        $token = SpotifyToken::where('user_id', $userId)->first();
-
-        if (!$token) {
-            throw new Exception('No token found for user');
-        }
-
-        if ($this->needsTokenRefresh($userId)) {
-            $this->refreshToken($userId);
-        }
-
-        return $token;
     }
 }
 
