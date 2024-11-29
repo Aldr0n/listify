@@ -5,21 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Playlist extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'name', 'description', 'thumbnail_url'];
+    protected $fillable = ['title', 'description', 'thumbnail_url', 'spotify_id', 'user_id'];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function tracks(): HasMany
+    public function tracks(): BelongsToMany
     {
-        return $this->hasMany(Track::class);
+        return $this->belongsToMany(Track::class);
     }
 }
