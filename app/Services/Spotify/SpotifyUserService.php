@@ -4,10 +4,11 @@ namespace App\Services\Spotify;
 
 use App\Contracts\Services\AppUserService;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class SpotifyUserService implements AppUserService
 {
-    public function storeUserProfile(int $userId, array $spotifyUser)
+    public function storeUserProfile(int $userId, array $spotifyUser): void
     {
         $spotifyUser = [
             'id'            => $spotifyUser['id'],
@@ -15,16 +16,17 @@ class SpotifyUserService implements AppUserService
             'thumbnail_url' => $spotifyUser['images'][0]['url'],
         ];
 
-        User::where('id', $userId)->update(['spotify_user' => $spotifyUser]);
+        Auth::user()->update(['spotify_user' => $spotifyUser]);
     }
 
-    public function deleteUserProfile(int $userId)
+    public function deleteUserProfile(int $userId): void
     {
-        User::where('id', $userId)->update(['spotify_user' => NULL]);
+        Auth::user()->update(['spotify_user' => NULL]);
     }
 
-    public function updateSpotifyConnection(int $userId, bool $isConnected)
+    public function setConnectionStatus(int $userId, bool $isConnected): void
     {
-        User::where('id', $userId)->update(['is_spotify_connected' => $isConnected]);
+        Auth::user()->update(['is_spotify_connected' => $isConnected]);
+    }
     }
 }
