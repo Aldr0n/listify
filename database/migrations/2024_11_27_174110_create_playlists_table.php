@@ -19,8 +19,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('spotify_id');
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('track_id')->constrained('tracks');
-            $table->string('thumbnail_url');
+            $table->string('thumbnail_url')->nullable();
         });
     }
 
