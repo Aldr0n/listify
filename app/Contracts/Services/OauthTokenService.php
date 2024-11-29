@@ -2,6 +2,8 @@
 
 namespace App\Contracts\Services;
 
+use App\Models\SpotifyToken;
+
 interface OauthTokenService
 {
     /**
@@ -17,10 +19,15 @@ interface OauthTokenService
     /**
      * Check if the token needs refresh
      */
-    public function needsTokenRefresh(int $userId): bool;
+    public function needsTokenRefresh(SpotifyToken $token): bool;
 
     /**
      * Refresh the access token
      */
     public function refreshToken(int $userId): void;
+
+    /**
+     * Get the valid token
+     */
+    public function getValidToken(int $userId): SpotifyToken;
 }
