@@ -11,7 +11,7 @@ class SpotifyUserService implements AppUserService
         protected SpotifyClientService $spotifyClientService,
     ) {}
 
-    public function storeUserProfile(int $userId)
+    public function storeUserProfile(int $userId, array $spotifyUser)
     {
         $this->spotifyClientService->fetchUserProfile($userId);
     }
@@ -19,5 +19,10 @@ class SpotifyUserService implements AppUserService
     public function deleteUserProfile(int $userId)
     {
         // TODO: Implement deleteUserProfile() method.
+    }
+
+    public function updateSpotifyConnection(int $userId, bool $isConnected)
+    {
+        User::where('id', $userId)->update(['is_spotify_connected' => $isConnected]);
     }
 }
