@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Contracts\Services\OauthTokenService;
 use App\Models\SpotifyToken;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -11,8 +12,14 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    private ?OauthTokenService $oauthTokenService = NULL;
+
+    protected function getOauthTokenService(): OauthTokenService
+    {
+        return $this->oauthTokenService ??= app(OauthTokenService::class);
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -54,5 +61,10 @@ class User extends Authenticatable
     public function spotifyToken(): HasOne
     {
         return $this->hasOne(SpotifyToken::class);
+    }
+
+    public function getValidSpotifyToken(): SpotifyToken
+    {
+        return $this->getOauthTokenService()->getValidToken($this->id);
     }
 }
