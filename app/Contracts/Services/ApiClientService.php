@@ -10,7 +10,7 @@ interface ApiClientService
 
     public function fetchUserProfile(string $spotifyUserId, SpotifyToken $token): array;
 
-    public function fetchPlaylistTracks(string $playlistId): array;
+    public function fetchPlaylistTracks(string $playlistId, SpotifyToken $token): array;
 
     public function refreshToken(int $userId): array;
 }
