@@ -2,25 +2,21 @@
 
 namespace App\Services\Spotify;
 
+use App\Contracts\Services\ApiClientService;
+use App\Contracts\Services\AppUserService;
 use App\Contracts\Services\OauthTokenService;
 use App\Models\SpotifyToken;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+use Socialite;
 
 class SpotifyAuthService implements OauthTokenService
 {
-
-    public function needsTokenRefresh(int $userId): bool
-    {
-        $token = $this->getValidToken($userId);
-
-        if (!$token) {
-            return FALSE;
-        }
-
-        return $token->expires_at->subMinutes(5)->isPast();
-    }
+    public function __construct(
+        protected ApiClientService $spotifyClientService,
+        protected AppUserService $spotifyUserService,
+    ) {}
 
     public function storeCredentials(int $userId, array $credentials): void
     {
@@ -42,7 +38,7 @@ class SpotifyAuthService implements OauthTokenService
             throw new Exception('No token found for user');
         }
 
-        if ($this->needsTokenRefresh($userId)) {
+        if ($this->needsTokenRefresh($token)) {
             $this->refreshToken($userId);
         }
 
@@ -51,35 +47,31 @@ class SpotifyAuthService implements OauthTokenService
 
     public function refreshToken(int $userId): void
     {
-        $token           = SpotifyToken::where('user_id', $userId)->first();
-        $basicAuthUser   = config('services.spotify.client_id');
-        $basicAuthSecret = config('services.spotify.client_secret');
+        $credentials = $this->spotifyClientService->refreshToken($userId);
+        $this->storeCredentials($userId, $credentials);
+    }
 
+    public function needsTokenRefresh(SpotifyToken $token): bool
+    {
         if (!$token) {
-            throw new Exception('No token found for user');
+            return FALSE;
         }
 
-        $response = Http::withBasicAuth($basicAuthUser, $basicAuthSecret)
-            ->asForm()
-            ->post(
-                config('services.spotify.api_auth_url'),
-                [
-                    'grant_type'    => 'refresh_token',
-                    'refresh_token' => $token->refresh_token,
-                ]
-            );
+        return $token->expires_at->subMinutes(5)->isPast();
+    }
 
-        if (!$response->successful()) {
-            throw new Exception('Failed to refresh token: ' . $response->body());
-        }
+    public function handleOauthCallback()
+    {
+        $callbackPayload = Socialite::driver('spotify')->user();
+        $credentials     = [
+            'access_token'  => $callbackPayload->token,
+            'refresh_token' => $callbackPayload->refreshToken,
+            'expires_at'    => Carbon::now()->addSeconds($callbackPayload->expiresIn),
+        ];
+        $spotifyUser     = $callbackPayload->user;
 
-        $credentials = $response->json();
-
-        $this->storeCredentials($userId, [
-            'access_token'  => $credentials['access_token'],
-            'refresh_token' => $credentials['refresh_token'] ?? $token->refresh_token,
-            'expires_in'    => $credentials['expires_in'],
-        ]);
+        $this->storeCredentials(Auth::id(), $credentials);
+        $this->spotifyUserService->storeUserProfile(Auth::id(), $spotifyUser);
     }
 }
 
