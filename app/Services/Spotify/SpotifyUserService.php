@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\Services\AppUserService;
+use App\Models\User;
 use App\Services\Spotify\SpotifyClientService;
 
 class SpotifyUserService implements AppUserService
@@ -13,12 +14,18 @@ class SpotifyUserService implements AppUserService
 
     public function storeUserProfile(int $userId, array $spotifyUser)
     {
-        $this->spotifyClientService->fetchUserProfile($userId);
+        $spotifyUser = [
+            'id'            => $spotifyUser['id'],
+            'display_name'  => $spotifyUser['display_name'],
+            'thumbnail_url' => $spotifyUser['images'][0]['url'],
+        ];
+
+        User::where('id', $userId)->update(['spotify_user' => $spotifyUser]);
     }
 
     public function deleteUserProfile(int $userId)
     {
-        // TODO: Implement deleteUserProfile() method.
+        User::where('id', $userId)->update(['spotify_user' => NULL]);
     }
 
     public function updateSpotifyConnection(int $userId, bool $isConnected)
