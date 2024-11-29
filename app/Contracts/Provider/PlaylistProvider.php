@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts\Services;
+namespace App\Contracts\Provider;
 
 use App\Models\Playlist;
 use Illuminate\Database\Eloquent\Collection;
