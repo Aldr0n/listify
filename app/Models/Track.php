@@ -11,10 +11,30 @@ class Track extends Model
     /** @use HasFactory<\Database\Factories\TrackFactory> */
     use HasFactory;
 
-    protected $fillable = ['id', 'name', 'artist', 'album', 'thumbnail_url'];
+    protected $fillable = [
+        'spotify_id',
+        'name',
+        'duration_ms',
+        'artists',
+        'album',
+        'thumbnail_url',
+        'href',
+        'popularity',
+        'track_number',
+        'explicit',
+        'available_markets',
+    ];
+
+    protected $casts = [
+        'artists'           => 'array',
+        'album'             => 'array',
+        'available_markets' => 'array',
+    ];
 
     public function playlist(): BelongsToMany
     {
         return $this->belongsToMany(Playlist::class);
     }
+
+
 }
