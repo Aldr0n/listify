@@ -70,7 +70,7 @@ class SpotifyAuthService implements OauthTokenService
         $spotifyUser         = $credentialsResponse->user;
 
         $this->storeCredentials(Auth::id(), $credentials);
-        $this->spotifyUserService->storeUserProfile(Auth::id(), $spotifyUser);
+        $this->spotifyUserService->storeUserProfile($spotifyUser);
     }
 }
 
