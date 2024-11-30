@@ -31,36 +31,18 @@ class ResolvePlaylistJob implements ShouldQueue
                 'playlist_id' => $this->playlistData['id'],
                 'job_id'      => $this->job->getJobId(),
             ]);
+
             return;
         }
 
-        Log::info('Starting playlist resolution', [
-            'playlist_id'   => $this->playlistData['id'],
-            'playlist_name' => $this->playlistData['name'],
-            'job_id'        => $this->job->getJobId(),
-            'attempt'       => $this->attempts(),
-        ]);
-
         try {
             $tracks = $libraryService->resolvePlaylistTracks($this->playlistData['id'], $this->spotifyToken);
-
-            Log::info('Resolved tracks for playlist', [
-                'playlist_id' => $this->playlistData['id'],
-                'track_count' => $tracks->count(),
-                'job_id'      => $this->job->getJobId(),
-            ]);
 
             $playlistData        = $this->playlistData;
             $playlistData['map'] = $tracks->pluck('spotify_id');
 
             $playlist = $libraryService->resolvePlaylist($playlistData);
             $playlist->tracks()->sync($tracks->pluck('id'));
-
-            Log::info('Completed playlist resolution', [
-                'playlist_id'   => $this->playlistData['id'],
-                'playlist_name' => $this->playlistData['name'],
-                'job_id'        => $this->job->getJobId(),
-            ]);
         }
         catch (\Exception $e) {
             Log::error('Failed to resolve playlist', [
