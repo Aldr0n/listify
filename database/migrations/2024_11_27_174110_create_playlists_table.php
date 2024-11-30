@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('spotify_id');
             $table->foreignId('user_id')->constrained('users');
             $table->string('thumbnail_url')->nullable();
+            $table->json('map');
         });
     }
 
