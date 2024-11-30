@@ -3,11 +3,17 @@
 namespace App\Services\Spotify;
 
 use App\Contracts\Services\AppUserService;
+use App\Models\Playlist;
 use App\Models\User;
+use App\Services\LibraryService;
 use Illuminate\Support\Facades\Auth;
 
 class SpotifyUserService implements AppUserService
 {
+    public function __construct(
+        protected LibraryService $libraryService,
+    ) {}
+
     public function storeUserProfile(int $userId, array $spotifyUser): void
     {
         $spotifyUser = [
@@ -28,5 +34,14 @@ class SpotifyUserService implements AppUserService
     {
         Auth::user()->update(['is_spotify_connected' => $isConnected]);
     }
+
+    public function syncUserPlaylists(array $playlists): void
+    {
+        $filteredPlaylists = array_filter($playlists['items'], function ($playlist)
+        {
+            return !is_null($playlist);
+        });
+
+        $this->libraryService->resolvePlaylists($filteredPlaylists);
     }
 }
