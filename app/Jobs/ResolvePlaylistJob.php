@@ -3,7 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\SpotifyToken;
-use App\Services\LibraryService;
+use App\Services\Playlist\PlaylistService;
+use App\Services\Spotify\SpotifyResolutionService;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,7 +25,7 @@ class ResolvePlaylistJob implements ShouldQueue
         private readonly SpotifyToken $spotifyToken
     ) {}
 
-    public function handle(LibraryService $libraryService): void
+    public function handle(SpotifyResolutionService $resolutionService, PlaylistService $playlistService): void
     {
         if ($this->batch()?->cancelled()) {
             Log::info('Job cancelled for playlist', [
@@ -36,12 +37,12 @@ class ResolvePlaylistJob implements ShouldQueue
         }
 
         try {
-            $tracks = $libraryService->resolvePlaylistTracks($this->playlistData['id'], $this->spotifyToken);
+            $tracks = $resolutionService->resolvePlaylistTracks($this->playlistData['id'], $this->spotifyToken);
 
             $playlistData        = $this->playlistData;
             $playlistData['map'] = $tracks->pluck('spotify_id');
 
-            $playlist = $libraryService->resolvePlaylist($playlistData);
+            $playlist = $playlistService->resolvePlaylist($playlistData);
             $playlist->tracks()->sync($tracks->pluck('id'));
         }
         catch (\Exception $e) {

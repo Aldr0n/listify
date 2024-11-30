@@ -3,15 +3,12 @@
 namespace App\Services\Spotify;
 
 use App\Contracts\Services\AppUserService;
-use App\Models\Playlist;
-use App\Models\User;
-use App\Services\LibraryService;
 use Illuminate\Support\Facades\Auth;
 
 class SpotifyUserService implements AppUserService
 {
     public function __construct(
-        protected LibraryService $libraryService,
+        protected SpotifyResolutionService $resolutionService,
     ) {}
 
     public function storeUserProfile(array $spotifyUser): void
@@ -42,6 +39,6 @@ class SpotifyUserService implements AppUserService
             return !is_null($playlist);
         });
 
-        $this->libraryService->resolvePlaylists($filteredPlaylists);
+        $this->resolutionService->resolvePlaylists($filteredPlaylists);
     }
 }
