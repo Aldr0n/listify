@@ -7,6 +7,7 @@ use App\Models\SpotifyToken;
 use App\Models\Track;
 use App\Services\Playlist\PlaylistService;
 use App\Services\Track\TrackService;
+use Illuminate\Bus\Batch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
@@ -20,30 +21,39 @@ class SpotifyResolutionService
         protected TrackService $trackService,
     ) {}
 
-    public function resolvePlaylists(array $playlists)
+    public function startPlaylistSync(): Batch
     {
-        $token  = Auth::user()->getValidSpotifyToken();
-        $userId = Auth::id();
+        $user      = Auth::user();
+        $token     = $user->getValidSpotifyToken();
+        $playlists = $this->spotifyClientService->fetchUserPlaylists($user->spotify_user['id'], $token);
 
-        $chain = array_map(
+        // Cleanup, spotify returns null items sometimes
+        $playlists = array_filter($playlists['items'], function (?array $playlist)
+        {
+            return !is_null($playlist);
+        });
+
+        return $this->resolvePlaylists($playlists, $token, $user->id);
+    }
+
+    public function resolvePlaylists(array $playlists, ?SpotifyToken $token = NULL, ?int $userId = NULL): Batch
+    {
+        $token ??= Auth::user()->getValidSpotifyToken();
+        $userId ??= Auth::id();
+
+        $jobs = array_map(
             function (array $playlist) use ($token, $userId)
             {
-                return $this->createResolvePlaylistJob($playlist, $token, $userId);
+                $playlist['user_id'] = $userId;
+                return new ResolvePlaylistJob($playlist, $token);
             },
             $playlists
         );
 
-        Bus::chain($chain)
+        return Bus::batch($jobs)
+            ->allowFailures()
             ->onQueue('playlists')
             ->dispatch();
-
-        return TRUE;
-    }
-
-    private function createResolvePlaylistJob(array $playlistData, SpotifyToken $token, int $userId): ResolvePlaylistJob
-    {
-        $playlistData['user_id'] = $userId;
-        return new ResolvePlaylistJob($playlistData, $token);
     }
 
     public function resolvePlaylistTracks(string $playlistId, SpotifyToken $spotifyToken): Collection
@@ -77,5 +87,27 @@ class SpotifyResolutionService
         );
 
         return new Collection($allTracks);
+    }
+
+    private function createResolvePlaylistJob(array $playlistData, SpotifyToken $token, int $userId): ResolvePlaylistJob
+    {
+        $playlistData['user_id'] = $userId;
+        return new ResolvePlaylistJob($playlistData, $token);
+    }
+
+    public function checkSyncStatus(string $batchId): array
+    {
+        $batch = Bus::findBatch($batchId);
+
+        return [
+            'id'             => $batch->id,
+            'total_jobs'     => $batch->totalJobs,
+            'pending_jobs'   => $batch->pendingJobs,
+            'failed_jobs'    => $batch->failedJobs,
+            'processed_jobs' => $batch->processedJobs(),
+            'progress'       => $batch->progress(),
+            'finished'       => $batch->finished(),
+            'cancelled'      => $batch->cancelled(),
+        ];
     }
 }
