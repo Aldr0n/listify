@@ -47,23 +47,16 @@ class SpotifyAuthService implements OauthTokenService
 
     public function refreshToken(int $userId): void
     {
-        $credentialsResponse = $this->spotifyClientService->refreshToken($userId);
-        $credentials         = [
-            ...array_values($credentialsResponse),
-            'expires_at' => Carbon::now()->addSeconds($credentialsResponse['expires_in'])->subMinutes(5),
-            'created_at' => Carbon::now(),
-        ];
+        $credentials               = $this->spotifyClientService->refreshToken($userId);
+        $credentials['expires_at'] = Carbon::now()->addSeconds($credentials['expires_in'])->subMinutes(5);
+        $credentials['created_at'] = Carbon::now();
 
         $this->storeCredentials($userId, $credentials);
     }
 
     public function needsTokenRefresh(SpotifyToken $token): bool
     {
-        if (!$token) {
-            return FALSE;
-        }
-
-        return $token->expires_at->subMinutes(5)->isPast();
+        return $token->expires_at->isPast();
     }
 
     public function handleOauthCallback()
