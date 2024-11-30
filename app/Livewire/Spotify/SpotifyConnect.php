@@ -12,7 +12,7 @@ class SpotifyConnect extends Component
 {
     private OauthTokenService $spotifyAuthService;
 
-    public function mount(OauthTokenService $spotifyAuthService)
+    public function boot(OauthTokenService $spotifyAuthService)
     {
         $this->spotifyAuthService = $spotifyAuthService;
     }
