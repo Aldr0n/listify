@@ -14,7 +14,7 @@ class SpotifyUserService implements AppUserService
         protected LibraryService $libraryService,
     ) {}
 
-    public function storeUserProfile(int $userId, array $spotifyUser): void
+    public function storeUserProfile(array $spotifyUser): void
     {
         $spotifyUser = [
             'id'            => $spotifyUser['id'],
@@ -25,12 +25,12 @@ class SpotifyUserService implements AppUserService
         Auth::user()->update(['spotify_user' => $spotifyUser]);
     }
 
-    public function deleteUserProfile(int $userId): void
+    public function deleteUserProfile(): void
     {
         Auth::user()->update(['spotify_user' => NULL]);
     }
 
-    public function setConnectionStatus(int $userId, bool $isConnected): void
+    public function setConnectionStatus(bool $isConnected): void
     {
         Auth::user()->update(['is_spotify_connected' => $isConnected]);
     }
