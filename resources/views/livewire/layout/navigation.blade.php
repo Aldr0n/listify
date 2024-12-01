@@ -23,16 +23,16 @@ new class extends Component
             <div class="flex grow">
                 <!-- Logo -->
                 <div class="flex items-center shrink-0">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
+                    <a href="{{ route('playlists') }}" wire:navigate>
                         <x-application-logo class="block w-auto text-gray-800 fill-current h-9" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
+                    {{-- <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
-                    </x-nav-link>
+                    </x-nav-link> --}}
                     <x-nav-link :href="route('playlists')" :active="request()->routeIs('playlists')" wire:navigate>
                         {{ __('Playlists') }}
                     </x-nav-link>
@@ -40,8 +40,10 @@ new class extends Component
 
                 <div class="flex items-center ml-auto space-x-2">
                     <livewire:spotify.spotify-connect />
-                    <livewire:spotify.sync-playlists />
-                    <livewire:test />
+                    @if (Auth::user()->is_spotify_connected)
+                        <livewire:spotify.sync-playlists />
+                        <livewire:test />
+                    @endif
                 </div>
             </div>
 
