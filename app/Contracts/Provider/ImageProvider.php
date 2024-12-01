@@ -2,15 +2,21 @@
 
 namespace App\Contracts\Provider;
 
+use App\Enums\MediaType;
+use Illuminate\Database\Eloquent\Model;
+
 interface ImageProvider
 {
-    /**
-     * Store an image 
-     */
-    public function storeImage(array $image, string $userId = NULL);
 
-    /**
-     * Get an image
-     */
-    public function getImage(string $imageId);
+    public function storeImage(array $image, MediaType $type): string;
+
+    public function getImage(string $imageId, MediaType $type): string;
+
+    public function downloadImage(string $imageUrl, MediaType $type): string;
+
+    public function getImageUrl(string $imageId, MediaType $type): string;
+
+    public function deleteImage(string $imageId, MediaType $type): void;
+
+    public function deleteForModel(Model $model, ?MediaType $type = NULL): void;
 }

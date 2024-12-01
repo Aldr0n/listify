@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
             $table->boolean('is_spotify_connected')->default(FALSE);
             $table->json('spotify_user')->nullable();
+            $table->string('thumbnail_id')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table)

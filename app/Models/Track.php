@@ -17,7 +17,7 @@ class Track extends Model
         'duration_ms',
         'artists',
         'album',
-        'thumbnail_url',
+        'thumbnail_id',
         'href',
         'popularity',
         'track_number',

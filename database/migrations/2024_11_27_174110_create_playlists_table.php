@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('spotify_id');
             $table->foreignId('user_id')->constrained('users');
+            $table->string('thumbnail_id')->nullable();
             $table->string('thumbnail_url')->nullable();
             $table->json('map');
         });

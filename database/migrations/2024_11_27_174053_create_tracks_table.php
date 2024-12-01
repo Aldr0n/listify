@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('duration_ms');
             $table->json('artists')->nullable();
             $table->json('album')->nullable();
+            $table->string('thumbnail_id')->nullable();
             $table->string('thumbnail_url')->nullable();
             $table->string('href')->nullable();
             $table->integer('popularity')->nullable();
