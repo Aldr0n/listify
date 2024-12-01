@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Playlist;
 use App\Http\Requests\StorePlaylistRequest;
 use App\Http\Requests\UpdatePlaylistRequest;
+use App\Models\Playlist;
 
 class PlaylistController extends Controller
 {
@@ -13,7 +13,7 @@ class PlaylistController extends Controller
      */
     public function index()
     {
-        //
+        return view('playlists');
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\SpotifyAuthController;
+use App\Http\Controllers\PlaylistController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -20,6 +21,11 @@ Route::middleware(['auth'])->group(function ()
 
     Route::get('/auth/spotify/callback', [SpotifyAuthController::class, 'callback'])
         ->name('spotify.callback');
+
+    Route::controller(PlaylistController::class)->group(function ()
+    {
+        Route::get('playlists', 'index')->name('playlists');
+    });
 });
 
 require __DIR__ . '/auth.php';
