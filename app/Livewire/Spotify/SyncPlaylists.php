@@ -18,6 +18,17 @@ class SyncPlaylists extends Component
         $this->spotifyResolutionService = $spotifyResolutionService;
     }
 
+    public function mount()
+    {
+        // Check for any existing running batch
+        $latestBatch = $this->spotifyResolutionService->getLatestRunningSyncBatch();
+
+        if ($latestBatch) {
+            $this->batchId   = $latestBatch->id;
+            $this->isPolling = TRUE;
+        }
+    }
+
     public function render()
     {
         return view('livewire.pages.auth.sync-playlists');

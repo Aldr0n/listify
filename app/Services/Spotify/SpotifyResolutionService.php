@@ -11,6 +11,7 @@ use Illuminate\Bus\Batch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class SpotifyResolutionService
@@ -33,7 +34,15 @@ class SpotifyResolutionService
             return !is_null($playlist);
         });
 
-        return $this->resolvePlaylists($playlists, $token, $user->id);
+        $batch = $this->resolvePlaylists($playlists, $token, $user->id);
+
+        Cache::put(
+            'spotify_sync_batch_' . $user->id,
+            $batch->id,
+            now()->addHours(1)
+        );
+
+        return $batch;
     }
 
     public function resolvePlaylists(array $playlists, ?SpotifyToken $token = NULL, ?int $userId = NULL): Batch
@@ -70,6 +79,8 @@ class SpotifyResolutionService
                 ]
             );
 
+            if (empty($data['items'])) break;
+
             // Map track items to Track models
             $tracks = collect($data['items'])->map(function (array $trackItem): Track
             {
@@ -89,12 +100,6 @@ class SpotifyResolutionService
         return new Collection($allTracks);
     }
 
-    private function createResolvePlaylistJob(array $playlistData, SpotifyToken $token, int $userId): ResolvePlaylistJob
-    {
-        $playlistData['user_id'] = $userId;
-        return new ResolvePlaylistJob($playlistData, $token);
-    }
-
     public function checkSyncStatus(string $batchId): array
     {
         $batch = Bus::findBatch($batchId);
@@ -109,5 +114,16 @@ class SpotifyResolutionService
             'finished'       => $batch->finished(),
             'cancelled'      => $batch->cancelled(),
         ];
+    }
+
+    public function getLatestRunningSyncBatch()
+    {
+        $batchId = Cache::get('spotify_sync_batch_' . Auth::id());
+
+        if (isset($batchId)) {
+            return Bus::findBatch($batchId);
+        }
+
+        return NULL;
     }
 }
