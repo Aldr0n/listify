@@ -20,6 +20,7 @@ class PlaylistList extends Component
 
     private ImageService $imageService;
     private PlaylistService $playlistService;
+    private $previousPlaylistHash = NULL;
 
     public function boot(ImageService $imageService, PlaylistService $playlistService)
     {
@@ -58,6 +59,12 @@ class PlaylistList extends Component
     #[On('playlist-sync-update')]
     public function getPlaylists()
     {
-        $this->dispatch('$refresh');
+        $currentPlaylists = $this->playlistService->search($this->search);
+        $currentHash      = md5(json_encode($currentPlaylists->pluck('updated_at')));
+
+        if ($this->previousPlaylistHash !== $currentHash) {
+            $this->previousPlaylistHash = $currentHash;
+            $this->dispatch('playlist-grid-update');
+        }
     }
 }
