@@ -18,16 +18,22 @@ class SpotifyAuthService implements OauthTokenService
         protected AppUserService $spotifyUserService,
     ) {}
 
-    public function storeCredentials(int $userId, array $credentials): void
+    public function storeCredentials(int $userId, array $credentials): SpotifyToken
     {
-        SpotifyToken::updateOrCreate(['user_id' => $userId], $credentials);
+        $token = SpotifyToken::updateOrCreate(['user_id' => $userId], $credentials);
         Auth::user()->update(['is_spotify_connected' => TRUE]);
+
+        \Log::info('Spotify credentials stored for user', ['user_id' => $userId]);
+
+        return $token;
     }
 
     public function removeCredentials(int $userId): void
     {
         SpotifyToken::where('user_id', $userId)->delete();
         Auth::user()->update(['is_spotify_connected' => FALSE]);
+
+        \Log::info('Spotify credentials removed for user', ['user_id' => $userId]);
     }
 
     public function getValidToken(int $userId): SpotifyToken
@@ -39,19 +45,21 @@ class SpotifyAuthService implements OauthTokenService
         }
 
         if ($this->needsTokenRefresh($token)) {
-            $this->refreshToken($userId);
+            return $this->refreshToken($userId);
         }
 
         return $token;
     }
 
-    public function refreshToken(int $userId): void
+    public function refreshToken(int $userId): SpotifyToken
     {
         $credentials               = $this->spotifyClientService->refreshToken($userId);
         $credentials['expires_at'] = Carbon::now()->addSeconds($credentials['expires_in'])->subMinutes(5);
         $credentials['created_at'] = Carbon::now();
 
-        $this->storeCredentials($userId, $credentials);
+        \Log::info('Spotify token refreshed for user', ['user_id' => $userId]);
+
+        return $this->storeCredentials($userId, $credentials);
     }
 
     public function needsTokenRefresh(SpotifyToken $token): bool

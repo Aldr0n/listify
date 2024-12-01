@@ -9,7 +9,7 @@ interface OauthTokenService
     /**
      * Store Spotify credentials for a user
      */
-    public function storeCredentials(int $userId, array $credentials): void;
+    public function storeCredentials(int $userId, array $credentials): SpotifyToken;
 
     /**
      * Remove Spotify credentials for a user
@@ -24,7 +24,7 @@ interface OauthTokenService
     /**
      * Refresh the access token
      */
-    public function refreshToken(int $userId): void;
+    public function refreshToken(int $userId): SpotifyToken;
 
     /**
      * Get the valid token
