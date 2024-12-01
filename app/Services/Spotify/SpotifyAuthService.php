@@ -67,18 +67,31 @@ class SpotifyAuthService implements OauthTokenService
         return $token->expires_at->isPast();
     }
 
+    public function redirectToSpotify()
+    {
+        return Socialite::driver('spotify')
+            ->scopes(['user-read-private', 'user-read-email']) // add your required scopes
+            ->redirect();
+    }
+
     public function handleOauthCallback()
     {
-        $credentialsResponse = Socialite::driver('spotify')->user();
-        $credentials         = [
-            'access_token'  => $credentialsResponse->token,
-            'refresh_token' => $credentialsResponse->refreshToken,
-            'expires_at'    => Carbon::now()->addSeconds($credentialsResponse->expiresIn)->subMinutes(5),
-        ];
-        $spotifyUser         = $credentialsResponse->user;
+        try {
+            $credentialsResponse = Socialite::driver('spotify')->user();
+            $credentials         = [
+                'access_token'  => $credentialsResponse->token,
+                'refresh_token' => $credentialsResponse->refreshToken,
+                'expires_at'    => Carbon::now()->addSeconds($credentialsResponse->expiresIn)->subMinutes(5),
+            ];
+            $spotifyUser         = $credentialsResponse->user;
 
-        $this->storeCredentials(Auth::id(), $credentials);
-        $this->spotifyUserService->storeUserProfile($spotifyUser);
+            $this->storeCredentials(Auth::id(), $credentials);
+            $this->spotifyUserService->storeUserProfile($spotifyUser);
+        }
+        catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            // Redirect back start again
+            return redirect()->route('spotify.auth');
+        }
     }
 }
 
