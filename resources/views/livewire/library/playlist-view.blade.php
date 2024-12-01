@@ -1,5 +1,13 @@
 <div class="overflow-x-auto">
-    <img src="{{ $playlist->thumbnail_url }}" alt="" class="object-cover w-full rounded-md max-w-[80px] aspect-square">
+    <div class="mb-4">
+        <input 
+            wire:model.live.debounce.300ms="search" 
+            type="text" 
+            placeholder="Search tracks..." 
+            class="w-full px-4 py-2 border rounded-md"
+        >
+    </div>
+    
     <table class="min-w-full table-auto">
         <thead>
             <tr class="border-b">
@@ -12,7 +20,7 @@
         <tbody>
             @foreach($tracks as $track)
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-2 font-mono text-gray-500">{{ $loop->iteration }}</td>
+                    <td class="px-4 py-2 font-mono text-gray-500">{{ $track->track_number }}</td>
                     <td class="px-4 py-2"><a class="hover:underline" href="{{ "https://open.spotify.com/track/" . basename($track->href) }}" target="_blank">{{ $track->name }}</a></td>
                     <td class="px-4 py-2"><a class="hover:underline" href="{{ "https://open.spotify.com/album/" . $track->album['id'] }}" target="_blank">{{ $track->album['name'] }}</a></td>
                     <td class="px-4 py-2">{{ $track->duration }}</td>

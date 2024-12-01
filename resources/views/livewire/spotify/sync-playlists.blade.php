@@ -1,6 +1,11 @@
 <div>
-    <button wire:click="syncUserPlaylists" class="flex flex-row gap-1 px-4 py-1 text-sm text-white rounded bg-slate-500" wire:loading.attr="disabled">
-        Sync user playlists
+    <button 
+        wire:click="syncUserPlaylists" 
+        class="flex flex-row gap-1 px-4 py-1 text-sm text-white rounded {{ $isPolling ? 'bg-slate-400 cursor-not-allowed' : 'bg-slate-500' }}" 
+        wire:loading.attr="disabled"
+        {{ $isPolling ? 'disabled' : '' }}
+    >
+        {{ $isPolling ? 'Syncing...' : 'Sync user playlists' }}
         @if($isPolling)
         <span wire:poll.1s="checkSyncStatus" class="flex flex-col">
             @if($status)
