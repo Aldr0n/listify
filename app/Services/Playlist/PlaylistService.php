@@ -7,6 +7,7 @@ use App\Enums\MediaType;
 use App\Models\Playlist;
 use App\Services\ImageService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class PlaylistService implements PlaylistProvider
@@ -23,6 +24,20 @@ class PlaylistService implements PlaylistProvider
     public function getPlaylists(int $userId): Collection
     {
         return Playlist::where('user_id', $userId)->get();
+    }
+
+    public function search(?string $searchTerm = NULL): LengthAwarePaginator
+    {
+        return Playlist::where('user_id', Auth::id())
+            ->when($searchTerm, function ($query) use ($searchTerm)
+            {
+                $query->where('title', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('tracks', function ($query) use ($searchTerm)
+                    {
+                        $query->where('name', 'like', '%' . $searchTerm . '%');
+                    });
+            })
+            ->paginate(10);
     }
 
     public function resolvePlaylist(array $playlistData): Playlist

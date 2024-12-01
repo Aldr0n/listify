@@ -3,10 +3,9 @@
 namespace App\Livewire\Library;
 
 use App\Enums\MediaType;
-use App\Models\Playlist;
 use App\Services\ImageService;
+use App\Services\Playlist\PlaylistService;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -16,18 +15,26 @@ class PlaylistList extends Component
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
+    protected $queryString = ['search'];
+    public string $search = '';
 
     private ImageService $imageService;
+    private PlaylistService $playlistService;
 
-    public function boot(ImageService $imageService)
+    public function boot(ImageService $imageService, PlaylistService $playlistService)
     {
-        $this->imageService = $imageService;
+        $this->imageService    = $imageService;
+        $this->playlistService = $playlistService;
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
     }
 
     public function render()
     {
-        $playlists = Playlist::where('user_id', Auth::id())
-            ->paginate(10);
+        $playlists = $this->playlistService->search($this->search);
 
         try {
             $playlists->through(function ($playlist)
