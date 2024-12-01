@@ -3,16 +3,18 @@
 namespace App\Livewire\Library;
 
 use App\Models\Playlist;
+use App\Services\ImageService;
 use Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class PlaylistList extends Component
 {
     public $playlists;
 
-    public function mount()
+    public function boot(ImageService $imageService)
     {
-        $this->playlists = $this->getPlaylists();
+        $this->imageService = $imageService;
     }
 
     public function render()
@@ -20,8 +22,9 @@ class PlaylistList extends Component
         return view('livewire.library.playlist-list');
     }
 
+    #[On('playlist-sync-update')]
     public function getPlaylists()
     {
-        return Playlist::all();
+        $this->dispatch('$refresh');
     }
 }

@@ -51,5 +51,7 @@ class SyncPlaylists extends Component
             $this->isPolling = FALSE;
             $this->status    = NULL;
         }
+
+        $this->dispatch('playlist-sync-update');
     }
 }
