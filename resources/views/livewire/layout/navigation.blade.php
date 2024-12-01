@@ -41,6 +41,7 @@ new class extends Component
                 <div class="flex items-center ml-auto space-x-2">
                     <livewire:spotify.spotify-connect />
                     <livewire:spotify.sync-playlists />
+                    <livewire:test />
                 </div>
             </div>
 
