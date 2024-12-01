@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('thumbnail_url')->nullable();
             $table->string('href')->nullable();
             $table->integer('popularity')->nullable();
-            $table->integer('track_number')->nullable();
             $table->boolean('explicit')->nullable();
             $table->json('available_markets')->nullable();
         });
