@@ -18,6 +18,52 @@ class TrackService implements TrackProvider
         return Track::all();
     }
 
+    public function getTracksByPlaylistMap(array $playlistMap): Collection
+    {
+        $tracks   = Track::whereIn('spotify_id', $playlistMap)->get();
+        $trackMap = $tracks->keyBy('spotify_id');
+
+        return collect($playlistMap)
+            ->map(fn($spotifyId) => $this->transformTrack($trackMap[$spotifyId] ?? NULL))
+            ->filter()
+            ->pipe(fn($tracks) => new Collection($tracks));
+    }
+
+    private function transformTrack(?Track $track): ?Track
+    {
+        if (!$track) {
+            return NULL;
+        }
+
+        $track->album = $this->formatAlbums($track);
+
+        $track->duration = $this->formatDuration($track->duration_ms);
+
+        return $track;
+    }
+
+    private function formatDuration(int $milliseconds): string
+    {
+        $minutes = floor($milliseconds / 60000);
+        $seconds = floor(($milliseconds % 60000) / 1000);
+
+        return sprintf('%d:%02d', $minutes, $seconds);
+    }
+
+    public function formatAlbums(Track $track)
+    {
+        $albumData = is_string($track->album) ? json_decode($track->album, TRUE) : $track->album;
+
+        return collect($albumData)->only([
+            'name',
+            'images',
+            'release_date',
+            'id',
+            'uri',
+            'artists',
+        ]);
+    }
+
     public function resolveTrack(array $trackObject): Track
     {
         $trackData = $trackObject['track'];
