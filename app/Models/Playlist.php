@@ -11,7 +11,7 @@ class Playlist extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'thumbnail_id', 'spotify_id', 'user_id', 'map'];
+    protected $fillable = ['title', 'description', 'thumbnail_id', 'thumbnail_url', 'spotify_id', 'user_id', 'map'];
 
     protected $casts = [
         'map' => 'array',

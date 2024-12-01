@@ -55,12 +55,15 @@ class PlaylistService implements PlaylistProvider
             \Log::info('Fetched Thumbnail ID: ' . $thumbnail_id);
         }
 
+        $thumbnail_url = $thumbnail_id ? $this->imageService->getImageUrl($thumbnail_id, MediaType::ALBUM_THUMBNAIL) : NULL;
+
         $playlist = [
-            'title'        => $playlistData['name'],
-            'description'  => $playlistData['description'] ?? NULL,
-            'thumbnail_id' => $thumbnail_id,
-            'user_id'      => $playlistData['user_id'] ?? Auth::id(),
-            'map'          => $playlistData['map'] ?? NULL,
+            'title'         => $playlistData['name'],
+            'description'   => $playlistData['description'] ?? NULL,
+            'thumbnail_id'  => $thumbnail_id,
+            'thumbnail_url' => $thumbnail_url,
+            'user_id'       => $playlistData['user_id'] ?? Auth::id(),
+            'map'           => $playlistData['map'] ?? NULL,
         ];
 
         return Playlist::updateOrCreate(
