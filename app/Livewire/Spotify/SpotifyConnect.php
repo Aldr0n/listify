@@ -19,7 +19,7 @@ class SpotifyConnect extends Component
 
     public function render(): Factory|View
     {
-        return view('livewire.pages.auth.spotify-connect', [
+        return view('livewire.spotify.spotify-connect', [
             'isConnected' => Auth::user()->spotifyToken !== NULL
         ]);
     }

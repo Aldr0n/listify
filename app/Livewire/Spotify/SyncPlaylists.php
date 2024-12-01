@@ -31,7 +31,7 @@ class SyncPlaylists extends Component
 
     public function render()
     {
-        return view('livewire.pages.auth.sync-playlists');
+        return view('livewire.spotify.sync-playlists');
     }
 
     public function syncUserPlaylists(): void
