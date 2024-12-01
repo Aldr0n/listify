@@ -37,6 +37,7 @@ class PlaylistService implements PlaylistProvider
 
         if ($thumbnail_url) {
             $thumbnail_id = $this->handleThumbnail($thumbnail_url);
+            \Log::info('Fetched Thumbnail ID: ' . $thumbnail_id);
         }
 
         $playlist = [
@@ -47,7 +48,7 @@ class PlaylistService implements PlaylistProvider
             'map'          => $playlistData['map'] ?? NULL,
         ];
 
-        return Playlist::firstOrCreate(
+        return Playlist::updateOrCreate(
             ['spotify_id' => $spotifyId],
             $playlist
         );

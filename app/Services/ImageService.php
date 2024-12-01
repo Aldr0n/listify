@@ -88,9 +88,8 @@ class ImageService implements ImageProvider
     {
         $this->validateImageData($image);
 
-        $id        = Str::uuid()->toString();
-        $extension = pathinfo($image['name'], PATHINFO_EXTENSION);
-        $filename  = "$id.$extension";
+        $id       = Str::uuid()->toString();
+        $filename = $id;
 
         if (!Storage::disk('public')->putFileAs($type->getLocation(), new File($image['tmp_name']), $filename)) {
             throw new RuntimeException('Failed to store image');
@@ -204,11 +203,11 @@ class ImageService implements ImageProvider
 
         $path = $type->getLocation() . '/' . $index[$id]['filename'];
 
-        if (!Storage::exists($path)) {
+        if (!Storage::disk('public')->exists($path)) {
             throw new RuntimeException("Image file missing: {$path}");
         }
 
-        return Storage::get($path);
+        return Storage::disk('public')->get($path);
     }
 
     public function getImageUrl(string $id, MediaType $type): string
@@ -216,11 +215,13 @@ class ImageService implements ImageProvider
         $index = $this->getIndex($type);
 
         if (!isset($index[$id])) {
-            throw new RuntimeException("Image not found: {$id}");
+            return "";
+            // throw new RuntimeException("Image not found: {$id}");
         }
 
         $path = $type->getLocation() . '/' . $index[$id]['filename'];
-        return Storage::url($path);
+
+        return Storage::disk('public')->url($path);
     }
 
     public function deleteImage(string $imageId, MediaType $type): void
