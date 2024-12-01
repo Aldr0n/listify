@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function ()
     Route::controller(PlaylistController::class)->group(function ()
     {
         Route::get('playlists', 'index')->name('playlists');
+        Route::get('playlists/{playlist}', 'show')->name('playlist.show');
     });
 });
 
