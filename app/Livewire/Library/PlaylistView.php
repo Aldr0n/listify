@@ -9,6 +9,7 @@ use Livewire\Component;
 class PlaylistView extends Component
 {
     public Playlist $playlist;
+    public string $search = '';
 
     private TrackService $trackService;
 
@@ -26,7 +27,17 @@ class PlaylistView extends Component
 
     public function getTracks()
     {
-        return $this->trackService->getTracksByPlaylistMap($this->playlist->map);
+        $tracks = $this->trackService->getTracksByPlaylistMap($this->playlist->map);
+
+        if ($this->search) {
+            $search = strtolower($this->search);
+            $tracks = collect($tracks)->filter(function ($track) use ($search)
+            {
+                return str_contains(strtolower($track['name']), $search);
+            });
+        }
+
+        return $tracks;
     }
 
 

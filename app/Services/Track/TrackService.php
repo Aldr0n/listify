@@ -24,7 +24,16 @@ class TrackService implements TrackProvider
         $trackMap = $tracks->keyBy('spotify_id');
 
         return collect($playlistMap)
-            ->map(fn($spotifyId) => $this->transformTrack($trackMap[$spotifyId] ?? NULL))
+            ->map(function ($spotifyId, $index) use ($trackMap)
+            {
+                if ($track = $trackMap[$spotifyId] ?? NULL) {
+                    // Clone the track to prevent sharing the same instance
+                    // This took way too long to figure out
+                    $track               = clone $track;
+                    $track->track_number = $index + 1;
+                }
+                return $this->transformTrack($track);
+            })
             ->filter()
             ->pipe(fn($tracks) => new Collection($tracks));
     }
