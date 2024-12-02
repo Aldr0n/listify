@@ -45,7 +45,6 @@ new class extends Component
                     <livewire:spotify.spotify-connect />
                     @if (Auth::user()->is_spotify_connected)
                         <livewire:spotify.sync-playlists />
-                        <livewire:test />
                     @endif
                 </div>
             </div>
