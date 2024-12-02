@@ -22,80 +22,83 @@ class PlaylistImport extends Component
         $this->spotifyResolutionService = $spotifyResolutionService;
     }
 
-    public function mount()
+    private function loadImportQueue(): void
     {
-
-        $this->isImporting = TRUE;
-
-        // Restore queue from cache
-        $this->importQueue = Cache::get('running_import_batches_' . Auth::id(), []);
-
-        \Log::info('Import queue: ' . print_r($this->importQueue, TRUE));
-
-        if ($this->importQueue === NULL || empty($this->importQueue) || !is_array($this->importQueue)) {
-            $this->importQueue = [];
-            return;
-        }
-        $this->updateImportStatus();
+        $this->importQueue = Cache::get('running_import_batches_' . Auth::id(), []) ?? [];
     }
 
-    #[On('playlist-import-requested')]
-    public function handlePlaylistImportRequest(array $playlist)
+    private function saveImportQueue(): void
     {
-        $importQueue = Cache::get('running_import_batches_' . Auth::id());
-
-        if (empty($importQueue) || !is_array($importQueue) || $importQueue === NULL) {
-            $this->importQueue = [];
-        }
-
-        if (isset($importQueue[$playlist['id']])) {
-            return;
-        }
-
-        $importBatch = $this->spotifyResolutionService->resolvePlaylists([$playlist]);
-
-        $importQueue[$playlist['id']] = $importBatch->id;
-
         Cache::put(
             'running_import_batches_' . Auth::id(),
-            $importQueue,
+            $this->importQueue,
             now()->addHours(1)
         );
-
-        $this->isImporting = TRUE;
-        $this->updateImportStatus();
     }
 
-    public function updateImportStatus()
+    private function updateImportQueueStatus(): void
     {
-        $localImportQueue = Cache::get('running_import_batches_' . Auth::id(), []);
+        $totalBatches         = count($this->importQueue);
+        $completedBatches     = 0;
+        $completedPlaylistIds = [];
 
-        if (empty($localImportQueue)) {
+        foreach ($this->importQueue as $playlistId => $batchId) {
+            $status = $this->spotifyResolutionService->checkSyncStatus($batchId);
+
+            if ($this->isBatchComplete($status)) {
+                $completedBatches++;
+                $completedPlaylistIds[] = $playlistId;
+            }
+        }
+
+        if ($completedBatches === $totalBatches && $totalBatches > 0) {
+            foreach ($completedPlaylistIds as $playlistId) {
+                unset($this->importQueue[$playlistId]);
+            }
+            $this->saveImportQueue();
+            \Log::info('All batches completed, clearing import queue');
+        }
+
+        \Log::info("Polling import status: {$completedBatches}/{$totalBatches} completed");
+        $this->importStatus = "Importing playlists: {$completedBatches}/{$totalBatches} completed";
+    }
+
+    private function isBatchComplete(array $status): bool
+    {
+        return $status['finished'] === TRUE
+            || $status['cancelled'] === TRUE
+            || $status['failed_jobs'] === $status['total_jobs'];
+    }
+
+    public function updateImportStatus(): void
+    {
+        $this->loadImportQueue();
+
+        if (empty($this->importQueue)) {
             $this->isImporting  = FALSE;
             $this->importStatus = '';
             return;
         }
 
-        $totalBatches     = count($localImportQueue);
-        $completedBatches = 0;
+        $this->isImporting = TRUE;
+        $this->updateImportQueueStatus();
+    }
 
-        foreach ($this->importQueue as $playlistId => $batchId) {
-            $status = $this->spotifyResolutionService->checkSyncStatus($batchId);
+    #[On('playlist-import-requested')]
+    public function handlePlaylistImportRequest(array $playlist): void
+    {
+        $this->loadImportQueue();
 
-            if ($status['finished'] === TRUE || $status['cancelled'] === TRUE || $status['failed_jobs'] === $status['total_jobs']) {
-                unset($this->importQueue[$playlistId]);
-                $completedBatches++;
-                \Log::info('Unsetting batch ' . $batchId);
-
-                Cache::put(
-                    'running_import_batches_' . Auth::id(),
-                    $this->importQueue,
-                    now()->addHours(1)
-                );
-            }
+        if (isset($this->importQueue[$playlist['id']])) {
+            return;
         }
 
-        $this->importStatus = "Importing playlists: {$completedBatches}/{$totalBatches} completed";
+        $importBatch                        = $this->spotifyResolutionService->resolvePlaylists([$playlist]);
+        $this->importQueue[$playlist['id']] = $importBatch->id;
+        $this->saveImportQueue();
+
+        $this->isImporting = TRUE;
+        $this->updateImportStatus();
     }
 
     public function render()

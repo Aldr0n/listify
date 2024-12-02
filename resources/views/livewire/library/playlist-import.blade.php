@@ -1,6 +1,6 @@
 <div>
     @if($isImporting)
-        <div wire:poll.2s="updateImportStatus" class="text-sm">
+        <div wire:poll.1s="updateImportStatus" class="text-sm">
             <div class="text-sm">
                 {{ $importStatus }}
             </div>
