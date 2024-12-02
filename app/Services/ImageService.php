@@ -215,8 +215,8 @@ class ImageService implements ImageProvider
         $index = $this->getIndex($type);
 
         if (!isset($index[$id])) {
+            \Log::error("Image not found: {$id}");
             return "";
-            // throw new RuntimeException("Image not found: {$id}");
         }
 
         $path = $type->getLocation() . '/' . $index[$id]['filename'];
@@ -239,11 +239,6 @@ class ImageService implements ImageProvider
             unset($index[$imageId]);
             $this->updateIndex($index, $type);
         }
-    }
-
-    public function deleteForModel(Model $model, ?MediaType $type = NULL): void
-    {
-        // TODO: Implement deleteForModel() method.
     }
 }
 
