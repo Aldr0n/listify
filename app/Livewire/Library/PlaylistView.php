@@ -4,11 +4,15 @@ namespace App\Livewire\Library;
 
 use App\Models\Playlist;
 use App\Services\Library\TrackService;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class PlaylistView extends Component
 {
     public Playlist $playlist;
+
+    #[Validate('min:3|string|regex:/^[a-zA-Z0-9\s\-\.\/\:\_\?\=\&]+$/')]
+    #[Validate(message: ['regex' => 'Search may only contain letters, numbers, common URL characters and hyphens'])]
     public string $search = '';
 
     private TrackService $trackService;
