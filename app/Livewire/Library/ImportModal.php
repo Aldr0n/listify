@@ -11,11 +11,6 @@ class ImportModal extends Component
     public $isOpen = FALSE;
     public string $checkImportUrl = '';
 
-    // public function mount()
-    // {
-    //     // Listen for the openModal event to open the modal.
-    // }
-
     public function openModal()
     {
         $this->isOpen = TRUE;

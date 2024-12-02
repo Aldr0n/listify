@@ -51,8 +51,6 @@ class PlaylistSearch extends Component
 
     public function startImport(string $playlistId)
     {
-        // dd($this->searchResults[$playlistId]);
-
         $this->dispatch('playlist-import-requested', playlist: $this->searchResults[$playlistId]);
     }
 
