@@ -77,6 +77,11 @@ class TrackService implements TrackProvider
     {
         $trackData = $trackObject['track'];
 
+        if (!$trackData['id']) {
+            \Log::error('No Spotify ID found in track data', ['track' => $trackObject]);
+            throw new \Exception('No Spotify ID found in track data');
+        }
+
         return Track::firstOrCreate(
             ['spotify_id' => $trackData['id']],
             [
@@ -86,7 +91,7 @@ class TrackService implements TrackProvider
                 'album'             => json_encode($trackData['album']),
                 'href'              => $trackData['href'],
                 'popularity'        => $trackData['popularity'],
-                'track_number'      => $trackData['track_number'],
+                // 'track_number'      => $trackData['track_number'],
                 'explicit'          => $trackData['explicit'],
                 'available_markets' => json_encode($trackData['available_markets']),
             ]
