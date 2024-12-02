@@ -9,11 +9,14 @@ interface TrackProvider
 {
     /**
      * Get multiple tracks
+     * @return Collection
      */
     public function getTracks(): Collection;
 
     /**
-     * Get a specific track
+     * Get track by ID
+     * @param string $trackId
+     * @return Track
      */
     public function getTrack(string $trackId): Track;
 }
