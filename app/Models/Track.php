@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Track extends Model
 {
-    /** @use HasFactory<\Database\Factories\TrackFactory> */
     use HasFactory;
 
     protected $fillable = [
