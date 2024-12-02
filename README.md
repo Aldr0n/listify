@@ -48,16 +48,16 @@ A Laravel-based web application that allows users to manage and analyze their Sp
    DB_USERNAME=root
    DB_PASSWORD=
 
-6. Run migrations
+7. Run migrations
    php artisan migrate
 
-7. Start the queue worker (keep this running in a separate terminal)
+8. Start the queue worker (keep this running in a separate terminal)
    php artisan queue:work --tries=3 --timeout=90 --max-jobs=1000 --max-time=3600
 
-8. Link storage for playlist covers
+9. Link storage for playlist covers
    php artisan storage:link
 
-9. Start the development server or use Laravel Herd
+10. Start the development server or use Laravel Herd
    php artisan serve
 
 Enjoy!
