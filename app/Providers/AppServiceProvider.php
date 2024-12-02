@@ -7,9 +7,11 @@ use App\Contracts\Provider\TrackProvider;
 use App\Contracts\Services\ApiClientService;
 use App\Contracts\Services\AppUserService;
 use App\Contracts\Services\OauthTokenService;
+use App\Contracts\Services\SearchServiceInterface;
 use App\Services\Playlist\PlaylistService;
 use App\Services\Spotify\SpotifyAuthService;
 use App\Services\Spotify\SpotifyClientService;
+use App\Services\Spotify\SpotifySearchService;
 use App\Services\Spotify\SpotifyUserService;
 use App\Services\Track\TrackService;
 use Illuminate\Support\Facades\Event;
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         // Register generic services
         $this->app->bind(PlaylistProvider::class, PlaylistService::class);
         $this->app->bind(TrackProvider::class, TrackService::class);
+        $this->app->bind(SearchServiceInterface::class, SpotifySearchService::class);
     }
 
     /**
