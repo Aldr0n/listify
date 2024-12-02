@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Contracts\Provider\ImageProvider;
 use App\Enums\MediaType;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +19,9 @@ class ImageService implements ImageProvider
     private array $indexCache = [];
 
     /**
-     * Get the storage path for the index file
+     * Get storage path for index file
+     * @param MediaType $type
+     * @return string
      */
     private function getIndexPath(MediaType $type): string
     {
@@ -28,7 +29,9 @@ class ImageService implements ImageProvider
     }
 
     /**
-     * Get the index for a media type
+     * Load index from cache or storage
+     * @param MediaType $type
+     * @return array
      */
     private function getIndex(MediaType $type): array
     {
@@ -45,7 +48,10 @@ class ImageService implements ImageProvider
     }
 
     /**
-     * Update the index for a media type
+     * Save index to cache and storage
+     * @param array $index
+     * @param MediaType $type
+     * @return void
      */
     private function updateIndex(array $index, MediaType $type): void
     {
@@ -57,9 +63,10 @@ class ImageService implements ImageProvider
     }
 
     /**
-     * Validate an uploaded image
-     *
+     * Validate uploaded image data
+     * @param array $image
      * @throws InvalidArgumentException
+     * @return void
      */
     private function validateImageData(array $image): void
     {
@@ -69,7 +76,10 @@ class ImageService implements ImageProvider
     }
 
     /**
-     * Create index entry for an image
+     * Create metadata entry for image
+     * @param string $filename
+     * @param array $metadata
+     * @return array
      */
     private function createIndexEntry(
         string $filename,
@@ -84,6 +94,13 @@ class ImageService implements ImageProvider
         ];
     }
 
+    /**
+     * Store uploaded image file
+     * @param array $image
+     * @param MediaType $type
+     * @return string Image ID
+     * @throws RuntimeException
+     */
     public function storeImage(array $image, MediaType $type): string
     {
         $this->validateImageData($image);
@@ -103,7 +120,10 @@ class ImageService implements ImageProvider
     }
 
     /**
-     * Find an existing image by its source URL
+     * Find image ID by source URL
+     * @param string $url
+     * @param MediaType $type
+     * @return string|null
      */
     public function findImageBySourceUrl(string $url, MediaType $type): ?string
     {
@@ -122,6 +142,13 @@ class ImageService implements ImageProvider
         return array_key_first($matches) ?: NULL;
     }
 
+    /**
+     * Download and store remote image
+     * @param string $imageUrl
+     * @param MediaType $type
+     * @return string Image ID
+     * @throws RuntimeException
+     */
     public function downloadImage(string $imageUrl, MediaType $type): string
     {
         try {
@@ -193,6 +220,13 @@ class ImageService implements ImageProvider
         }
     }
 
+    /**
+     * Get image contents by ID
+     * @param string $id
+     * @param MediaType $type
+     * @return string
+     * @throws RuntimeException
+     */
     public function getImage(string $id, MediaType $type): string
     {
         $index = $this->getIndex($type);
@@ -210,6 +244,12 @@ class ImageService implements ImageProvider
         return Storage::disk('public')->get($path);
     }
 
+    /**
+     * Get public URL for image
+     * @param string $id
+     * @param MediaType $type
+     * @return string
+     */
     public function getImageUrl(string $id, MediaType $type): string
     {
         $index = $this->getIndex($type);
@@ -224,6 +264,13 @@ class ImageService implements ImageProvider
         return Storage::disk('public')->url($path);
     }
 
+    /**
+     * Delete image and its index entry
+     * @param string $imageId
+     * @param MediaType $type
+     * @return void
+     * @throws RuntimeException
+     */
     public function deleteImage(string $imageId, MediaType $type): void
     {
         $index = $this->getIndex($type);
