@@ -5,7 +5,8 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Livewire\Volt\Volt;
 
-test('confirm password screen can be rendered', function () {
+test('confirm password screen can be rendered', function ()
+{
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/confirm-password');
@@ -15,7 +16,8 @@ test('confirm password screen can be rendered', function () {
         ->assertStatus(200);
 });
 
-test('password can be confirmed', function () {
+test('password can be confirmed', function ()
+{
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -26,11 +28,12 @@ test('password can be confirmed', function () {
     $component->call('confirmPassword');
 
     $component
-        ->assertRedirect('/dashboard')
+        ->assertRedirect('/playlists')
         ->assertHasNoErrors();
 });
 
-test('password is not confirmed with invalid password', function () {
+test('password is not confirmed with invalid password', function ()
+{
     $user = User::factory()->create();
 
     $this->actingAs($user);
