@@ -3,14 +3,15 @@
 namespace App\Services\Spotify;
 
 use App\Contracts\Services\ApiClientService;
+use App\Enums\SpotifySearchType;
 use App\Models\SpotifyToken;
-use App\Services\Spotify\SpotifyUserService;
 use Exception;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class SpotifyClientService implements ApiClientService
 {
-    private $baseUrl;
+    private string $baseUrl;
 
     public function __construct()
     {
@@ -22,7 +23,7 @@ class SpotifyClientService implements ApiClientService
         $response = Http::withToken($token->access_token)
             ->get("{$this->baseUrl}/users/{$spotifyUserId}/playlists");
 
-        return $response->json();
+        return $this->validateResponse($response);
     }
 
     public function fetchUserProfile(string $spotifyUserId, SpotifyToken $token): array
@@ -30,17 +31,7 @@ class SpotifyClientService implements ApiClientService
         $response = Http::withToken($token->access_token)
             ->get("{$this->baseUrl}/users/{$spotifyUserId}");
 
-        if (!$response->successful()) {
-            throw new \RuntimeException("Failed to fetch Spotify profile: {$response->status()} - {$response->body()}");
-        }
-
-        $data = $response->json();
-
-        if (!is_array($data)) {
-            throw new \RuntimeException('Spotify API returned invalid data format');
-        }
-
-        return $data;
+        return $this->validateResponse($response);
     }
 
     public function fetchPlaylistTracks(string $playlistId, SpotifyToken $token, array $params = []): array
@@ -48,19 +39,7 @@ class SpotifyClientService implements ApiClientService
         $response = Http::withToken($token->access_token)
             ->get("{$this->baseUrl}/playlists/{$playlistId}/tracks", $params);
 
-        if (!$response->successful()) {
-            throw new \RuntimeException(
-                "Failed to fetch playlist tracks: {$response->status()} - {$response->body()}"
-            );
-        }
-
-        $data = $response->json();
-
-        if (!is_array($data) || !isset($data['items'])) {
-            throw new \RuntimeException('Spotify API returned invalid data format');
-        }
-
-        return $data;
+        return $this->validateResponse($response);
     }
 
     public function refreshToken(int $userId): array
@@ -83,14 +62,30 @@ class SpotifyClientService implements ApiClientService
                 ]
             );
 
+        return $this->validateResponse($response);
+    }
+
+    public function search(string $query, SpotifyToken $token, ?array $params = [], SpotifySearchType $type = SpotifySearchType::PLAYLIST): array
+    {
+        $params = [...$params, 'q' => $query, 'limit' => 50, 'type' => $type->getSearchType()];
+
+        $response = Http::withToken($token->access_token)
+            ->get("{$this->baseUrl}/search", $params);
+
+        return $this->validateResponse($response);
+    }
+
+    private function validateResponse(Response $response): array
+    {
+
         if (!$response->successful()) {
-            throw new Exception('Failed to refresh token: ' . $response->body());
+            throw new Exception('Unsuccessful response from Spotify API: ' . $response->body());
         }
 
         $data = $response->json();
 
         if (!is_array($data)) {
-            throw new \RuntimeException('Spotify API returned invalid data format');
+            throw new \RuntimeException('Invalid data format from Spotify API: ' . $response->body());
         }
 
         return $data;

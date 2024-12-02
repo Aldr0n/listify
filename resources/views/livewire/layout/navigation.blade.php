@@ -36,6 +36,9 @@ new class extends Component
                     <x-nav-link :href="route('playlists')" :active="request()->routeIs('playlists')" wire:navigate>
                         {{ __('Playlists') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('search')" :active="request()->routeIs('search')" wire:navigate>
+                        {{ __('Search Online') }}
+                    </x-nav-link>
                 </div>
 
                 <div class="flex items-center ml-auto space-x-2">
