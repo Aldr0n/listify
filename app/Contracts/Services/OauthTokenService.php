@@ -7,27 +7,38 @@ use App\Models\SpotifyToken;
 interface OauthTokenService
 {
     /**
-     * Store Spotify credentials for a user
+     * Store OAuth credentials
+     * @param int $userId
+     * @param array $credentials
+     * @return SpotifyToken
      */
     public function storeCredentials(int $userId, array $credentials): SpotifyToken;
 
     /**
-     * Remove Spotify credentials for a user
+     * Remove user's OAuth credentials
+     * @param int $userId
+     * @return void
      */
     public function removeCredentials(int $userId): void;
 
     /**
-     * Check if the token needs refresh
+     * Check if token requires refresh
+     * @param SpotifyToken $token
+     * @return bool
      */
     public function needsTokenRefresh(SpotifyToken $token): bool;
 
     /**
-     * Refresh the access token
+     * Refresh user's access token
+     * @param int $userId
+     * @return SpotifyToken
      */
     public function refreshToken(int $userId): SpotifyToken;
 
     /**
-     * Get the valid token
+     * Get valid token for user
+     * @param int $userId
+     * @return SpotifyToken
      */
     public function getValidToken(int $userId): SpotifyToken;
 }
