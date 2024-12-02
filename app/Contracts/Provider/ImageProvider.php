@@ -17,6 +17,4 @@ interface ImageProvider
     public function getImageUrl(string $imageId, MediaType $type): string;
 
     public function deleteImage(string $imageId, MediaType $type): void;
-
-    public function deleteForModel(Model $model, ?MediaType $type = NULL): void;
 }
