@@ -8,12 +8,12 @@ use App\Contracts\Services\ApiClientService;
 use App\Contracts\Services\AppUserService;
 use App\Contracts\Services\OauthTokenService;
 use App\Contracts\Services\SearchServiceInterface;
-use App\Services\Playlist\PlaylistService;
+use App\Services\Library\PlaylistService;
 use App\Services\Spotify\SpotifyAuthService;
 use App\Services\Spotify\SpotifyClientService;
 use App\Services\Spotify\SpotifySearchService;
 use App\Services\Spotify\SpotifyUserService;
-use App\Services\Track\TrackService;
+use App\Services\Library\TrackService;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Track;
+namespace App\Services\Library;
 
 use App\Contracts\Provider\TrackProvider;
 use App\Models\Track;

@@ -5,8 +5,8 @@ namespace App\Services\Spotify;
 use App\Jobs\ResolvePlaylistJob;
 use App\Models\SpotifyToken;
 use App\Models\Track;
-use App\Services\Playlist\PlaylistService;
-use App\Services\Track\TrackService;
+use App\Services\Library\PlaylistService;
+use App\Services\Library\TrackService;
 use Illuminate\Bus\Batch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +37,7 @@ class SpotifyResolutionService
         $batch = $this->resolvePlaylists($playlists, $token, $user->id);
 
         Cache::put(
-            'spotify_sync_batch_' . $user->id,
+            "spotify_sync_batch_{$user->id}",
             $batch->id,
             now()->addHours(1)
         );

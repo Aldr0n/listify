@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\SpotifyToken;
-use App\Services\Playlist\PlaylistService;
+use App\Services\Library\PlaylistService;
 use App\Services\Spotify\SpotifyResolutionService;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;

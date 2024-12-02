@@ -3,7 +3,7 @@
 namespace App\Livewire\Library;
 
 use App\Models\Playlist;
-use App\Services\Track\TrackService;
+use App\Services\Library\TrackService;
 use Livewire\Component;
 
 class PlaylistView extends Component

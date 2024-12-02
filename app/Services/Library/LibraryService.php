@@ -7,9 +7,9 @@ use App\Contracts\Provider\TrackProvider;
 use App\Models\Playlist;
 use App\Models\SpotifyToken;
 use App\Models\Track;
-use App\Services\Playlist\PlaylistService;
+use App\Services\Library\PlaylistService;
+use App\Services\Library\TrackService;
 use App\Services\Spotify\SpotifyResolutionService;
-use App\Services\Track\TrackService;
 use Illuminate\Database\Eloquent\Collection;
 
 class LibraryService implements PlaylistProvider, TrackProvider

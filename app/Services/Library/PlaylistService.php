@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Playlist;
+namespace App\Services\Library;
 
 use App\Contracts\Provider\PlaylistProvider;
 use App\Enums\MediaType;

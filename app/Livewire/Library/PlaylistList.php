@@ -4,7 +4,7 @@ namespace App\Livewire\Library;
 
 use App\Enums\MediaType;
 use App\Services\ImageService;
-use App\Services\Playlist\PlaylistService;
+use App\Services\Library\PlaylistService;
 use Exception;
 use Livewire\Attributes\On;
 use Livewire\Component;
