@@ -13,9 +13,7 @@ use RuntimeException;
 
 class ImageService implements ImageProvider
 {
-    /**
-     * @var array<string, array> Cache for indexes
-     */
+
     private array $indexCache = [];
 
     /**
@@ -94,13 +92,6 @@ class ImageService implements ImageProvider
         ];
     }
 
-    /**
-     * Store uploaded image file
-     * @param array $image
-     * @param MediaType $type
-     * @return string Image ID
-     * @throws RuntimeException
-     */
     public function storeImage(array $image, MediaType $type): string
     {
         $this->validateImageData($image);
@@ -142,13 +133,6 @@ class ImageService implements ImageProvider
         return array_key_first($matches) ?: NULL;
     }
 
-    /**
-     * Download and store remote image
-     * @param string $imageUrl
-     * @param MediaType $type
-     * @return string Image ID
-     * @throws RuntimeException
-     */
     public function downloadImage(string $imageUrl, MediaType $type): string
     {
         try {
@@ -201,7 +185,7 @@ class ImageService implements ImageProvider
                 $index[$newId]['source_url'] = $imageUrl;
                 $this->updateIndex($index, $type);
 
-                // If we had an existing image, delete it after successful download
+                // If image exists, delete it after successful download
                 if ($existingImageId !== NULL) {
                     $this->deleteImage($existingImageId, $type);
                 }
@@ -209,7 +193,7 @@ class ImageService implements ImageProvider
                 return $newId;
             }
             finally {
-                // Ensure we clean up the temp file
+                // Ensure temp file is deleted
                 if (file_exists($tmpPath)) {
                     unlink($tmpPath);
                 }
@@ -220,13 +204,6 @@ class ImageService implements ImageProvider
         }
     }
 
-    /**
-     * Get image contents by ID
-     * @param string $id
-     * @param MediaType $type
-     * @return string
-     * @throws RuntimeException
-     */
     public function getImage(string $id, MediaType $type): string
     {
         $index = $this->getIndex($type);
@@ -244,12 +221,6 @@ class ImageService implements ImageProvider
         return Storage::disk('public')->get($path);
     }
 
-    /**
-     * Get public URL for image
-     * @param string $id
-     * @param MediaType $type
-     * @return string
-     */
     public function getImageUrl(string $id, MediaType $type): string
     {
         $index = $this->getIndex($type);
@@ -264,13 +235,6 @@ class ImageService implements ImageProvider
         return Storage::disk('public')->url($path);
     }
 
-    /**
-     * Delete image and its index entry
-     * @param string $imageId
-     * @param MediaType $type
-     * @return void
-     * @throws RuntimeException
-     */
     public function deleteImage(string $imageId, MediaType $type): void
     {
         $index = $this->getIndex($type);
