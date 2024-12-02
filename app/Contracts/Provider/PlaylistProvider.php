@@ -9,11 +9,16 @@ interface PlaylistProvider
 {
     /**
      * Get all user playlists
+     * @param int $userId
+     * @return Collection
      */
     public function getPlaylists(int $userId): Collection;
 
     /**
-     * Get a specific user playlist
+     * Get single playlist by ID
+     * @param int $userId
+     * @param string $playlistId
+     * @return Playlist
      */
     public function getPlaylist(int $userId, string $playlistId): Playlist;
 }
