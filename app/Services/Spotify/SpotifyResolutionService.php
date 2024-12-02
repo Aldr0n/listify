@@ -82,10 +82,19 @@ class SpotifyResolutionService
             if (empty($data['items'])) break;
 
             // Map track items to Track models
-            $tracks = collect($data['items'])->map(function (array $trackItem): Track
-            {
-                return $this->trackService->resolveTrack($trackItem);
-            });
+            $tracks = collect($data['items'])
+                ->map(function (array $trackItem): ?Track
+                {
+                    try {
+                        return $this->trackService->resolveTrack($trackItem);
+                    }
+                    catch (\Exception $e) {
+                        \Log::error('Failed to resolve track', ['track' => $trackItem]);
+                        return NULL;
+                    }
+                })
+                ->filter() // Removes null values
+                ->values(); // Reindex array after filtering
 
             $allTracks = array_merge($allTracks, $tracks->all());
             $offset += 100;
@@ -119,6 +128,17 @@ class SpotifyResolutionService
     public function getLatestRunningSyncBatch()
     {
         $batchId = Cache::get('spotify_sync_batch_' . Auth::id());
+
+        if (isset($batchId)) {
+            return Bus::findBatch($batchId);
+        }
+
+        return NULL;
+    }
+
+    public function getLatestRunningImportBatch()
+    {
+        $batchId = Cache::get('playlist_import_batch_' . Auth::id());
 
         if (isset($batchId)) {
             return Bus::findBatch($batchId);
