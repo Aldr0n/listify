@@ -37,12 +37,12 @@ class ResolvePlaylistJob implements ShouldQueue
         }
 
         try {
-            $tracks = $resolutionService->resolvePlaylistTracks($this->playlistData['id'], $this->spotifyToken);
-
+            $tracks              = $resolutionService->resolvePlaylistTracks($this->playlistData['id'], $this->spotifyToken);
             $playlistData        = $this->playlistData;
             $playlistData['map'] = $tracks->pluck('spotify_id');
 
             $playlist = $playlistService->resolvePlaylist($playlistData);
+
             $playlist->tracks()->sync($tracks->pluck('id'));
         }
         catch (\Exception $e) {
